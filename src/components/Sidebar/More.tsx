@@ -20,7 +20,7 @@ export default function More() {
         More
       </Typography>
   
-      <Box mt={1} mb={1}>
+      <Box mt={1} >
         {menuItems.map((item) => (
           <Box
             key={item.path}

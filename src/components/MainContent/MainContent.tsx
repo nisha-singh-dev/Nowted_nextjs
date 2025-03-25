@@ -58,9 +58,10 @@ const MainContent = () => {
   });
 
   // Fetch folders
-  const { data: folders } = useQuery<foldertype[]>({
+  const { data: folders,refetch } = useQuery<foldertype[]>({
     queryKey: ["folders"],
     queryFn: fetchFolders,
+    enabled: false,
   });
 
   useEffect(() => {
@@ -70,7 +71,7 @@ const MainContent = () => {
     }
   }, [note]);
 
- // function for updating note title and content
+  // function for updating note title and content
   const updateMutation = useMutation({
     mutationFn: ({
       field,
@@ -102,47 +103,26 @@ const MainContent = () => {
     },
   });
 
-  // function for changing note properties (fav, archive, delete)
-  // const updatePropertyMutation = useMutation({
-  //   mutationFn: async ({
-  //     property,
-  //     value,
-  //   }: {
-  //     property: string;
-  //     value: boolean;
-  //   }) => {
-  //     await updateNoteProperty(noteId as string, property, value);
-  //   },
-  //   onSuccess: (_, { property, value }) => {
-  //     queryClient.invalidateQueries({ queryKey: ["note", noteId] });
-  //     queryClient.invalidateQueries({ queryKey: ["notes"] });
-
-  //     if (property === "isArchived") {
-  //       const folderId = note?.folder?.id;
-  //       const folderName = note?.folder?.name;
-
-  //       if (value) {
-  //         router.push(`/folder/${folderName}/${folderId}`);
-  //       } else {
-  //         router.push(`/folder/${folderName}/${folderId}/notes/${noteId}`);
-  //       }
-  //     }
-  //   },
-  // });
   const updatePropertyMutation = useMutation({
-    mutationFn: async ({ property, value }: { property: string; value: boolean }) => {
+    mutationFn: async ({
+      property,
+      value,
+    }: {
+      property: string;
+      value: boolean;
+    }) => {
       await updateNoteProperty(noteId as string, property, value);
     },
     onSuccess: (_, { property, value }) => {
       queryClient.invalidateQueries({ queryKey: ["note", noteId] });
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-  
+
       const isFolderRoute = pathname.startsWith("/folder/");
       const isMenuRoute = pathname.startsWith("/menu/");
       const menuType = pathname.split("/")[2];
       const folderId = note?.folder?.id;
       const folderName = note?.folder?.name;
-  
+
       if (property === "isArchived") {
         if (isFolderRoute) {
           if (value) {
@@ -164,16 +144,14 @@ const MainContent = () => {
           }
         }
       }
-  
+
       if (property === "isFavorite") {
         if (isMenuRoute && menuType === "favourites" && !value) {
-          router.push(`/menu/favourites`); 
+          router.push(`/menu/favourites`);
         }
       }
     },
   });
-  
-  
 
   //delete note
   const deleteMutation = useMutation({
@@ -254,7 +232,7 @@ const MainContent = () => {
             open={Boolean(optionsMenuAnchor)}
             onClose={() => setOptionsMenuAnchor(null)}
             PaperProps={{
-              sx: { backgroundColor: "grey.500" }, 
+              sx: { backgroundColor: "grey.500" },
             }}
           >
             <MenuItem
@@ -268,7 +246,7 @@ const MainContent = () => {
               sx={{
                 backgroundColor: "grey.500",
                 "&:hover": { backgroundColor: "grey.700" },
-              }} 
+              }}
             >
               <ListItemIcon>
                 <Image src={fav} alt="Favorite" width={20} height={20} />
@@ -317,21 +295,37 @@ const MainContent = () => {
               <Image src={dateIcon} alt="Date" width={20} height={20} />
               <Typography variant="body2">
                 <strong>Date:</strong>{" "}
-                <Typography component="span" ml={2} > {new Date(note.createdAt).toLocaleDateString()}</Typography>
-
-               
+                <Typography component="span" ml={2}>
+                  {" "}
+                  {new Date(note.createdAt).toLocaleDateString()}
+                </Typography>
               </Typography>
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
               <Image src={folderIcon} alt="Folder" width={20} height={20} />
-              <Typography
-                variant="body2"
-                onDoubleClick={(e) => setFolderMenuAnchor(e.currentTarget)}
-                
-              >
+              <Typography variant="body2">
                 <strong>Folder:</strong>
-                 <Typography component="span" ml={2} sx={{ cursor: "pointer", borderBottom: "1px dashed #888" }}>{note.folder.name || "No Folder"}</Typography>
+                <Typography
+                  component="span"
+                  ml={2}
+                  sx={{
+                    cursor: pathname.startsWith("/menu/")
+                      ? "default"
+                      : "pointer",
+                    borderBottom: pathname.startsWith("/menu/")
+                      ? "none"
+                      : "1px dashed #888",
+                  }}
+                  onDoubleClick={(e) => {
+                    if (!pathname.startsWith("/menu/")) {
+                      setFolderMenuAnchor(e.currentTarget);
+                      refetch(); 
+                    }
+                  }}
+                >
+                  {note.folder.name || "No Folder"}
+                </Typography>
               </Typography>
             </Box>
 
@@ -339,6 +333,20 @@ const MainContent = () => {
               anchorEl={folderMenuAnchor}
               open={Boolean(folderMenuAnchor)}
               onClose={() => setFolderMenuAnchor(null)}
+              PaperProps={{
+                sx: {
+                  maxHeight: "250px", 
+                  overflowY: "auto",
+                  backgroundColor: "gray",
+                  "&::-webkit-scrollbar": {
+                    width: "6px",
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: "grey",
+                    borderRadius: "4px",
+                  },
+                },
+              }}
             >
               {folders?.map((folder) => (
                 <MenuItem
@@ -354,14 +362,21 @@ const MainContent = () => {
             </Menu>
           </Box>
 
-      
-
-          <Box sx={{ flexGrow: 1, overflowY: "auto", mt: 2,"&::-webkit-scrollbar": { width: "6px" }, 
-          "&::-webkit-scrollbar-thumb": { backgroundColor: "white", borderRadius: "4px" } }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              overflowY: "auto",
+              mt: 2,
+              "&::-webkit-scrollbar": { width: "6px" },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "white",
+                borderRadius: "4px",
+              },
+            }}
+          >
             <TextField
               fullWidth
               multiline
-              // minRows={15}
               value={editedContent}
               onChange={(e) => handleEdit("content", e.target.value)}
               InputProps={{ sx: { color: "#fff", fontSize: "1.1rem" } }}
@@ -376,9 +391,3 @@ const MainContent = () => {
 };
 
 export default MainContent;
-
-
-
-
-
-

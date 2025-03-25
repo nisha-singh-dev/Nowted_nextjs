@@ -73,7 +73,6 @@ export default function FolderList() {
       <Box 
         sx={{ 
           overflowY: "auto",  
-          // maxHeight: "220px", 
           pr: 1, 
           "&::-webkit-scrollbar": { width: "6px" }, 
           "&::-webkit-scrollbar-thumb": { backgroundColor: "#555", borderRadius: "4px" } 

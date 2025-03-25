@@ -50,7 +50,7 @@ export default function MiddleList() {
 
   return (
     <Box
-      width="20%"
+      width="25%"
       height="100vh"
       bgcolor="grey.900"
       p={2}
@@ -112,96 +112,4 @@ export default function MiddleList() {
 
 
 
-
-//perfect but no pagination
-
-// "use client";
-
-// import { usePathname } from "next/navigation";
-// import { useQuery } from "@tanstack/react-query";
-// import { Box, Typography, List } from "@mui/material";
-// import MiddleCard from "./MiddleCard";
-// import { fetchNotes } from "@/utils/api";
-
-// interface NoteType {
-//   id: string;
-//   title: string;
-//   preview: string;
-//   createdAt: string;
-//   updatedAt: string;
-//   folderId: string;
-//   folder: {
-//     id: string;
-//     name: string;
-//   };
-// }
-
-// export default function MiddleList() {
-//   const pathname = usePathname();
-//   const pathSegments = pathname.split("/").filter(Boolean);
-  
-//   const isFolder = pathSegments[0] === "folder";
-//   const isMenu = pathSegments[0] === "menu";
-//   const folderId = isFolder ? pathSegments[2] : null;
-//   const folderName = isFolder ? decodeURIComponent(pathSegments[1]) : null;
-
-
-//   const menuType = isMenu ? pathSegments[1] : null;
-
-//   const title = folderId 
-//   ? folderName 
-//   : menuType === "favourites" 
-//     ? "Favorites"
-//     : menuType === "archived" 
-//       ? "Archived"
-//       : menuType === "trash" 
-//         ? "Trash"
-//         : ""; 
-
-//   const { data: notes = [], isLoading } = useQuery<NoteType[]>({
-//     queryKey: ["notes", folderId ?? undefined, menuType ?? undefined], 
-//     queryFn: () => fetchNotes(folderId ?? undefined, menuType ?? undefined), 
-//     enabled: !!folderId || !!menuType, 
-//   });
-  
-  
-
-//   return (
-//     <Box
-//       width="20%"
-//       height="100vh"
-//       bgcolor="grey.900"
-//       p={2}
-//       display="flex"
-//       flexDirection="column"
-//     >
-//       <Typography variant="h6" color="white" pb={2} textAlign="center">
-//         {folderId? folderName: title}
-//       </Typography>
-
-//       <Box flex={1} overflow="auto">
-//         {isLoading ? (
-//           <Typography color="white" textAlign="center">Loading...</Typography>
-//         ) : notes.length > 0 ? (
-//           <List sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-//             {notes.map((note) => (
-//               <MiddleCard 
-//               key={note.id} 
-//               note={note}  
-//               folderName={folderName} 
-//               folderId={folderId} 
-//               noteId={note.id} 
-//               menuType = {menuType}
-//             />
-//             ))}
-//           </List>
-//         ) : (
-//           <Typography color="white" textAlign="center" >
-//             Select a folder to view notes.
-//           </Typography>
-//         )}
-//       </Box>
-//     </Box>
-//   );
-// }
 

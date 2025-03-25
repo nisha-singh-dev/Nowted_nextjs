@@ -29,6 +29,7 @@ const RestoreContent = () => {
       alert("Note restored successfully!");
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       queryClient.invalidateQueries({ queryKey: ["note", noteId]});
+    
 
       if (note?.isArchived) {
         router.push(`/menu/archived/notes/${note?.id}`);

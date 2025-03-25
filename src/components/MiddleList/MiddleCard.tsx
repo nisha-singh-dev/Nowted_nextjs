@@ -55,7 +55,7 @@ export default function MiddleCard({ note, folderName, folderId, noteId, menuTyp
             {note.createdAt ? new Date(note.createdAt).toLocaleDateString() : "No Date"}
           </Typography>
           <Typography variant="body2">
-            {note.preview ? note.preview.substring(0, 13) + "..." : "No Content"}
+            {note.preview ? note.preview.substring(0,9) + "..." : "No Content"}
           </Typography>
         </Box>
       </Paper>
